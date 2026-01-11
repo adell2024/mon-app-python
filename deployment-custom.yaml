@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mon-app-python
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mon-app-python
+  template:
+    metadata:
+      labels:
+        app: mon-app-python
+    spec:
+      nodeName: k8s-master
+      containers:
+      - name: python-app
+        # Attention : utilise exactement le nom affiché lors de l'import (avec docker.io/library/)
+        image: aabda2006/mon-app-python:v1 
+        # CRUCIAL : Empêche K8s d'essayer de télécharger l'image sur Internet
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000
+        env:
+        - name: APP_MSG
+          value: "Message via Docker Hub et CI/CD !"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: python-service
+spec:
+  type: NodePort
+  selector:
+    app: mon-app-python
+  ports:
+    - port: 80
+      targetPort: 5000
+      nodePort: 30080

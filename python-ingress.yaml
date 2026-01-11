@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: python-app-ingress
+  annotations:
+    # Cette annotation permet de mieux gérer les ports NodePort
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_input_headers "Host: python.lab";
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: python.lab
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: python-service
+            port:
+              number: 80
